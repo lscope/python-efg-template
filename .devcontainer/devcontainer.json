@@ -14,7 +14,7 @@
 	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [5601],
+	"forwardPorts": [5601, 9200, 9300],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bash ./cli/init.sh",
