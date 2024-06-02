@@ -2,28 +2,34 @@ version: '3.8'
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     environment:
       - discovery.type=single-node
     ports:
       - "9200:9200"
       - "9300:9300"
-    # volumes:
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     #   - elasticsearch-data:/usr/share/elasticsearch/data
 
-  logstash:
-    image: docker.elastic.co/logstash/logstash:7.10.0
+  fluentd:
+    build: ./fluentd
     ports:
-      - "5000:5000"
+      - "24224:24224"
+      - "24224:24224/udp"
+    links:
+      - "elasticsearch"
     volumes:
-      - ./logstash:/usr/share/logstash/pipeline
+      - ./fluentd/conf:/fluentd/etc
     depends_on:
       - elasticsearch
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.0
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:
-      - "5601:5601"
+      - "3000:3000"
     depends_on:
       - elasticsearch
 
@@ -32,7 +38,7 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - logstash
+      - fluentd
 
 networks:
   default:

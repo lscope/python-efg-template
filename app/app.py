@@ -1,17 +1,21 @@
-import time
+from fluent import handler
 import logging
-import logstash
+import time
 
+# Configurazione del logger
+logger = logging.getLogger("fluent.test")
+logger.setLevel(logging.INFO)
 
-# Logstash configuration
-host = "logstash"
-
-logger = logging.getLogger("python-logstash-logger") # Logger name
-logger.setLevel(logging.INFO) # Log level
-logger.addHandler(logstash.TCPLogstashHandler(host, 5000, version=1)) # Logstash handler
-
-
-
+# Configurazione dell'handler per Fluentd
+fluent_handler = handler.FluentHandler("app.follow", host="fluentd", port=24224)
+formatter = handler.FluentRecordFormatter({
+    "host": "%(hostname)s",
+    "where": "%(module)s.%(funcName)s",
+    "type": "%(levelname)s",
+    "stack_trace": "%(exc_text)s"
+})
+fluent_handler.setFormatter(formatter)
+logger.addHandler(fluent_handler)
 
 
 

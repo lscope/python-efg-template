@@ -1,1 +1,1 @@
-python-logstash
+fluent-logger
